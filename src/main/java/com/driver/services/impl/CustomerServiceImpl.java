@@ -3,6 +3,7 @@ package com.driver.services.impl;
 import com.driver.model.TripBooking;
 import com.driver.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.driver.model.Customer;
@@ -13,7 +14,10 @@ import com.driver.repository.TripBookingRepository;
 import com.driver.model.TripStatus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static com.driver.model.TripStatus.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -30,12 +34,13 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public void register(Customer customer) {
 		//Save the customer in database
+		customerRepository2.save(customer);
 	}
 
 	@Override
 	public void deleteCustomer(Integer customerId) {
 		// Delete customer without using deleteById function
-
+		customerRepository2.deleteById(customerId);
 	}
 
 	@Override
@@ -43,17 +48,53 @@ public class CustomerServiceImpl implements CustomerService {
 		//Book the driver with lowest driverId who is free (cab available variable is Boolean.TRUE). If no driver is available, throw "No cab available!" exception
 		//Avoid using SQL query
 
+
+		// finding a nearest driver
+		List<Driver> driverList = driverRepository2.findAll();
+		int lowestDriverId = Integer.MAX_VALUE;
+		Driver availableDriver = null;
+		for (Driver driver: driverList) {
+			if(driver.getDriverId() < lowestDriverId){
+				if(driver.getCab().isAvailable()){
+					availableDriver = driver;
+				}
+			}
+		}
+		if (availableDriver == null) throw new Exception("No cab available!");
+
+
+		// finding trip details
+		List<TripBooking> tripBookingList = availableDriver.getTripBookingList();
+
+		TripBooking tripBooked = null;
+
+		for (TripBooking tripBooking: tripBookingList) {
+			if(tripBooking.getFromLocation().equals(fromLocation) && tripBooking.getToLocation().equals(toLocation) && tripBooking.getDistanceInKm() == distanceInKm){
+				tripBooked = tripBooking;
+			}
+		}
+
+		if(tripBooked != null){
+			tripBooked.setStatus(CONFIRMED);
+		}else{
+			throw new Exception("No cab available!");
+		}
+		return tripBooked;
 	}
 
 	@Override
 	public void cancelTrip(Integer tripId){
 		//Cancel the trip having given trip Id and update TripBooking attributes accordingly
-
+		TripBooking tripBooked = tripBookingRepository2.getOne(tripId);
+		tripBooked.setStatus(CANCELED);
+		tripBookingRepository2.save(tripBooked);
 	}
 
 	@Override
 	public void completeTrip(Integer tripId){
 		//Complete the trip having given trip Id and update TripBooking attributes accordingly
-
+		TripBooking tripBooked = tripBookingRepository2.getOne(tripId);
+		tripBooked.setStatus(COMPLETED);
+		tripBookingRepository2.save(tripBooked);
 	}
 }
