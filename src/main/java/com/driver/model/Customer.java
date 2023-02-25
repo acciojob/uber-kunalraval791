@@ -11,10 +11,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int customerId;
 
-    @NotNull
+
     private String mobile;
 
-    @NotNull
+
     private String password;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)

@@ -11,13 +11,13 @@ public class TripBooking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int tripBookingId;
 
-    @NotNull
+
     private String fromLocation;
 
-    @NotNull
+
     private String toLocation;
 
-    @NotNull
+
     private int distanceInKm;
 
     @Enumerated(value = EnumType.STRING)

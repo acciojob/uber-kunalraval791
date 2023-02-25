@@ -10,10 +10,8 @@ public class Admin{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int adminId;
 
-    @NotNull
     private String username;
 
-    @NotNull
     private String password;
 
     public Admin() {

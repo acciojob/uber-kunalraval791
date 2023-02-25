@@ -13,10 +13,10 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int driverId;
 
-    @NotNull
+
     private String mobile;
 
-    @NotNull
+
     private String password;
 
     @OneToOne
